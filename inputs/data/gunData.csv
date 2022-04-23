@@ -1,0 +1,3 @@
+﻿,cost,pen,head_close,body_close,leg_close,dropoff,fire_rate,mag,head_mid,body_mid,leg_mid,head_long,body_long,leg_long,ttk_close,ttk_mid,ttk_long
+phantom,2900,mid,156,39,33,yes,11,30,140,35,29,124,31,26,0.36,0.45,0.45
+vandal,2900,mid,160,40,34,no,9.75,25,160,40,34,160,40,34,0.41,0.41,0.41
