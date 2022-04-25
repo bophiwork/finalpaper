@@ -3,7 +3,7 @@ title: "The State of Guns in Valorant"
 subtitle: "The reality of precise gunplay"
 author: 
   - Bo Phi 
-thanks: "Code and data are available at: https://github.com/bophiwork/paper2work."
+thanks: "Code and data are available at: https://github.com/bophiwork/finalpaper."
 date: "`r format(Sys.time(), '%d %B %Y')`"
 abstract: "Advertised as an FPS shooter with precise gunplay, Valorant has quickly become of the most popular games in the world since its release in 2020. The various guns used within the game play an important role in determining the way players approach the game and the general rhythm of a match. The properties and statistics of each gun create distinct playstyles and scenarios in which each gun should be used and analyzing the data can greatly improve a player’s ability to adapt to the game and improve their game sense. This statistical report uses data obtained by Valorant to (1) examine the optimal gun for specific scenarios in Valorant, and (2), discuss the difference between guns and determine which guns are better for specific playstyles and game states. As a game with 15 million monthly active users, having an understanding of how to optimize your gameplay can provide a competitive advantage against other players when climbing the ranks."
 output:
@@ -31,58 +31,71 @@ library(ggplot2)
 
 gunData <- readr::read_csv("/cloud/project/inputs/data/gunData.csv"
                       )
+rateData <- readr::read_csv("/cloud/project/inputs/data/rateData.csv"
+                      )
 ```
 
 # Introduction
 
-You can and should cross-reference sections and sub-sections. For instance, Section \@ref(data). R Markdown automatically makes the sections lower case and adds a dash to spaces to generate labels, for instance, Section \@ref(first-discussion-point). 
+Released midway through 2020, Valorant made a strong impression on the gaming community. Amplified by everyone already being at home due to the global pandemic, the game initially saw a large player base upon release due to attracting cult fans from other Riot Games like League of Legends and Legends of Runeterra, along with garnering the attention from fans of first-person shooter (FPS) games like CS:GO and Overwatch to name a few. As a result, the game was a global sensation upon its release. The game was advertised as a tactical shooter requiring precise gunplay. This tells us a lot already by the style of gameplay we are to expect as players. Tactical shooters tended to require more methodical strategical play and also involve a higher level of skill, with raw gameplay mechanics having precedent over lucky shots by players. Competitive gameplay revolves around a round based system where you earn economy resulting from winning or losing rounds which influence your ability to buy weapons on the next round. As gunplay is the bread and butter of the game, it is important to understand the guns eligible to be bought, and the different scenarios in which you should buy a specific weapon. In a game that requires as much precision as Valorant, making the correct gun purchase for a given circumstance can make the difference between winning or losing a game.
 
+Within the game, there are different classes of guns that exist. There are handguns, rifles, light machine guns, heavy machine guns, and snipers. The most common guns purchased are two rifles called the Phantom and the Vandal. The reason these guns are the most popular is because of their versatility in use, cost effectiveness, and overall strength. These guns in particular in similar in many ways. They both cost 2900 credits and are automatic weapons, meaning you can spray continuously with the gun. They both have similar damage and firing rate statistics but the slight differences between the two guns forces players to consider which gun they should buy given the current game state. 	
+
+Understanding all the factors that go into which guns are more optimal for a given game state is an important skill to develop when trying to gain game sense and improve at the game. Ultimately, the players that understand the game to a higher degree than their enemies will have a stronger sense of advantages they can take to give them the extra edge needed to win something as simple as a gun fight that contributes towards winning the game. For this report, I will be using data from Valorant to examine the differences between the two most popular guns. More importantly, I will use the data to discuss the different scenarios in which each gun should be purchased and discuss how there are many more factors that goes into buying a specific weapon than just the pure numbers. The data will be processed and analyzed in R [@citeR] using the ‘tidyverse’ [@tidy] amd ‘dplyr’ [@dplyr] packages. The packages ‘knitr’ [@knitR], ‘bookdown’ [@bookdown], and ‘tinytex’ [@tinytex] are also used to generate the final markdown report.
 
 
 # Data
 
-Our data is of penguins (Figure \@ref(fig:bills)).
+This report uses data given from Valorant [@valorant]. Valorant is a game that is always going minor bug tweaks as well as major patches in order to keep the game optimized and evolving. The data we will analyze contains the stats and qualities of the two guns we will be focused on. Because there are occasional changes to these guns via game patches, this data will be accurate as of April of 2022. Some of the data associated with each weapon include how penetrable the bullets are, the first bullet accuracy, and the associated damage values for hitting specific parts of an enemy’s character model. The main data points I will be focusing on in my analysis will be rate of fire of each weapon, along with their damages at different distances. 
 
-```{r bills, fig.cap="Bills of penguins", echo = FALSE}
+This plot below shows the relationship between each gun’s rate of fire along with their respective magazine size. Through this graph, we find that the Phantom has the clear advantage is both regards. Surprisingly, we find that the firing rate and magazine size of the Phantom are both higher than that of the Vandal. Another way we could look at this plot is understanding this relationship as possible damage output per magazine. Through this plot, we can understand that the Phantom will outperform the Vandal in a dual if both players start firing at the same time because the rate of fire on the Phantom is simply higher. Additionally, the magazine size is a clear advantage for the Phantom because of needing to reload less frequently. I can imagine cases were players had already been engaging in multiple gunfights and the Phantom has the added possibility to put out more damage in a fight before dying merely due to the additional magazine size.
 
+```{r rate, fig.cap="Firing Rate Comparison", echo = FALSE}
+plot(gunData$fire_rate, gunData$mag, main = "Firing Rate vs. Magazine Size")
 ```
 
-Talk more about it.
+The three plots below shows us the amount of time it takes to kill a player for each gun at varying distances. There are a few things that this data assumes that are important to note when looking at the plots. The time to kill data points are calculated assuming that enemies have 150 hitpoints (HP). The data also assumes that the player will hit consecutive body shots until the enemy is dead. Through the three plots, we find that the time to kill for the Vandal is always the same. At close ranges, the time to kill for the Phantom is superior but at longer distances, the Phantom becomes inferior to the Vandal. The assumptions made in constructing this data is a big source of my analysis which we will discuss.
 
-Also bills and their average (Figure \@ref(fig:billssssss)). (Notice how you can change the height and width so they don't take the whole page?)
-
-```{r billssssss, fig.cap="More bills of penguins", echo = FALSE, fig.width=8, fig.height=4}
-
-
+```{r close, fig.cap="Close range speeds", echo = FALSE}
+guns <- c(1, 2)
+plot (guns, axes = FALSE, frame.plot = TRUE, gunData$ttk_close, main = "Time to Kill Comparison: Close Range")
+axis(1, at = c(1, 2), labels = c("Phantom", "Vandal"))
+axis(2, at = c(0.36, 0.41))
+```
+```{r mid, fig.cap="Mid range speeds", echo = FALSE}
+guns <- c(1, 2)
+plot (guns, axes = FALSE, frame.plot = TRUE, gunData$ttk_mid, main = "Time to Kill Comparison: Mid Range")
+axis(1, at = c(1, 2), labels = c("Phantom", "Vandal"))
+axis(2, at = c(0.45, 0.41))
+```
+```{r long, fig.cap="Long range speeds", echo = FALSE}
+guns <- c(1, 2)
+plot (guns, axes = FALSE, frame.plot = TRUE, gunData$ttk_long, main = "Time to Kill Comparison: Long Range")
+axis(1, at = c(1, 2), labels = c("Phantom", "Vandal"))
+axis(2, at = c(0.45, 0.41))
 ```
 
-Talk way more about it. 
+
+
 
 
 
 # Results
+The key findings we can draw from our plots are that at close ranges, the Phantom is statistically superior, but at longer ranges, the consistency of the Vandal start to be beneficial. Additionally, we find that the rate of fire and magazine size of each gun leans in favor of the Phantom to allow players to output more damage.
+
+# Weaknesses
+The data I was able to examine leaves a lot of questions on the table still. There are statistics I would love to examine but there does not seem to be official data on numbers I would be interested in. Some numbers or data that would be helpful to examine would be seeing the percentage of players in each rank that use each gun. That would give me an understanding of whether better players prefer a specific gun and vice versa. Additionally, I would be curious to see if gun purchase rates change per map as opposed to per player. This would allow me to understand if some players are influenced by what map they are playing when they buy either the Phantom or Vandal. I will be discussing the various ways in which a multitude of factors we do not have metrics on could also influence the buying choices of players. 
 
 # Discussion
+Looking at our data and findings, we were able to come to strong conclusions but as a player myself, I know that there is much more that goes into a rifle buy decision than meets the eye. Let’s first take a look at the time to kill statistics for each respective gun. As mentioned earlier, we found that the Phantom only had a faster time to kill in close ranges as compared to mid and long ranges where the Vandal’s stats were consistent. This is because the Phantom features a quality that the Vandal does not called damage dropoff. The Phantom’s do less damage depending on how far the enemy is. Specifically, the Phantom’s damage in close range is 156/39/33 to head, body, and legs. The mid range and long range values are 140/35/29 and 124/31/26. This allows our plots to make much more sense. Because the hit values of the Vandal are consistently 160/40/34 at all ranges, this means that to the time to kill a person with 150 health would require 4 bullets to the body. Because of the Phantom having damage dropoff, it makes as to why the gun is more ideal in close range scenarios as opposed to longer ranged battles. In close range, the Phantom also only needs 4 bullets to kill a full HP enemy, and because the firing rate of the Phantom is higher, the time to kill will be faster. For mid and long ranges, the Phantom actually requires 5 bullets to hit an enemy’s body in order to kill them as opposed to 4. This accounts for the increased time to kill found in the Phantom’s mid and long range performance. This provides us with a stark contrast to the first plot that clearly showed the Phantom reasonably being the clear better weapon.
 
-## Phantom vs. Vandal
+There are still many factors that influence what gun players should buy that we do not have the data to analyze yet. Firstly, one of the things we are overlooking the most is player preference. Many of the players coming into Valorant had prior experience with CS:GO, which featured a gun nearly identical to the Vandal. Because the guns feel similar to use, players making the switch over to Valorant may have just gravitated to something the were already familiar with. Additionally, the guns aside from their statistical differences, also have different spray patterns. The Vandal has a spray pattern that is harder control which would urge newer players towards using the Phantom. One of the biggest selling points of buying the Vandal is always being able to kill enemies with a headshot no matter the distance. The unsatisfactory of getting a headshot with the Phantom and it not resulting in a kill is extremely frustrating and never occurs while using the Vandal. This supports the idea that the gun you should use also depends on your playstyle. If you are a newer player and have a tendency to spray full magazines at enemies, the Phantom would seem to be more advantageous. If you are a player that likes to single-tap enemies or has a higher headshot percentage, the Vandal is likely to be your weapon of choice because of it’s consistency. I imagine that the usage rate of the Phantom is higher in lower ranked environments like in the iron and bronze ranks. Conversely, I would imagine the usage rates of the Vandal in higher ranked competitive play like in the radiant or immortal ranks because of the players headshot percentages likely to be higher. Whether a player is attacking or defending also play a role in influencing what gun you should buy. Defenders tend to play close corners where the Phantom’s value would be more apparent. Attackers seek to find opening kills in round so having the ability to guarentee a kill with a single headshot from any teammate is appealing for the Vandal. The map played has a large influence as well. Some maps force players to engage in longer range gunfights where the ability to one-tap with the Vandal is favorable. Other maps force players to fight in close quarters and higher time to kill in those close range scenarios would be favored by the Phantom.
 
-
-## Playstyle Matters
-
-## Skill Matters
-
-## Weaknesses and next steps
-
-Weaknesses and next steps should also be included.
+Conclusively, there are many factors to consider for players in deciding whether to purchase the Phantom or Vandal. It comes down to understanding the game state and which guns are favorable for specific scenarios. The Phantom is favored in close range combat and suitable for a spray playstyle. The Vandal is favored in longer range duals and suitable for players with a higher rate of landing headshots. At the end of the day, it also comes down to personal preference. If one gun just feels better to you, the comfort of playing with something familiar can influence the outcome of a game as much as the small statistical differences between the two guns.
 
 \newpage
 
 \appendix
-
-# Appendix {-}
-
-
-# Additional details
 
 
 \newpage
